@@ -1,6 +1,8 @@
 use std::env;
 use std::process::Command;
 use reqwest;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn cheater(path: &str) {
     let resp = Command::new("wget")
@@ -33,10 +35,19 @@ fn main() {
     // cheats and just runs the wget command from terminal
     // cheater(&args[1]);
 
-    let body = reqwest::blocking::get(&args[1])
-                .expect("is this the error message")
-                .text()
+    let webpage = reqwest::blocking::get(&args[1])
+                .expect("is this the error message");
+    
+    
+    let body = webpage.text()
                 .expect("if this fails im fucked");
     
-    println!("{}", body);
+    // println!("{}", body);
+
+    let file_path: &str = "index.html";
+    let mut write_out = File::create(file_path)
+                                                    .expect("cmon now");
+
+    write_out.write_all(&body.as_bytes())
+                .expect("sure hope that write worked");
 }
