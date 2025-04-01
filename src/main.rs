@@ -14,21 +14,20 @@ fn cheater(path: &str) {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let mut args: Vec<String> = env::args().collect();
     dbg!(&args);
 
     if args.len() < 2 {
         panic!("no url in arguments");
     }
 
-    // todo: check for 'https://' in string
-    println!("args prefix: {}", &args[1][0..7]);
-
+    // println!("args prefix: {}", &args[1][0..7]);
     if !["https:/", "http://"].contains(&&args[1][0..7]) {
-       panic!("bad url: missing prefix");
+    //    panic!("bad url: missing prefix");
+        args[1] = "https://".to_owned() + &args[1];
     }
 
-    println!("{}", &args[1]);
+    // println!("{}", &args[1]);
 
     // wget 2 (version 1)
     // cheats and just runs the wget command from terminal
