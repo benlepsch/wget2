@@ -23,13 +23,24 @@ fn main() {
         panic!("no url in arguments");
     }
 
+    let filename;
+
     // println!("args prefix: {}", &args[1][0..7]);
     if !["https:/", "http://"].contains(&&args[1][0..7]) {
     //    panic!("bad url: missing prefix");
+        filename = args[1].clone();
         args[1] = "https://".to_owned() + &args[1];
+    } else {
+        // strip http or https
+        if &args[1][4..5] == "s" {
+            filename = args[1][8..].to_string();
+        } else {
+            filename = args[1][7..].to_string();
+        }
     }
 
     // println!("{}", &args[1]);
+    println!("using filename {} ", &filename);
 
     // wget 2 (version 1)
     // cheats and just runs the wget command from terminal
@@ -37,15 +48,15 @@ fn main() {
 
     let webpage = reqwest::blocking::get(&args[1])
                 .expect("is this the error message");
-    
+
+    dbg!(&webpage);
     
     let body = webpage.text()
                 .expect("if this fails im fucked");
     
     // println!("{}", body);
 
-    let file_path: &str = "index.html";
-    let mut write_out = File::create(file_path)
+    let mut write_out = File::create(filename)
                                                     .expect("cmon now");
 
     write_out.write_all(&body.as_bytes())
