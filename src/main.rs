@@ -35,7 +35,8 @@ fn main() {
 
     let body = reqwest::blocking::get(&args[1])
                 .expect("is this the error message")
-                .text();
+                .text()
+                .expect("if this fails im fucked");
     
-    println!("{}", body.expect("why am i doing this"));
+    println!("{}", body);
 }
