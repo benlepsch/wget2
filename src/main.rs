@@ -1,23 +1,23 @@
 use std::env;
-use std::process::Command;
+// use std::process::Command;
 use reqwest;
 use std::fs::File;
 use std::io::prelude::*;
 
-fn cheater(path: &str) {
-    let resp = Command::new("wget")
-                .arg(path)
-                .output()
-                .expect("wget command failed to start");
+// fn cheater(path: &str) {
+//     let resp = Command::new("wget")
+//                 .arg(path)
+//                 .output()
+//                 .expect("wget command failed to start");
 
-    println!("status: {}", &resp.status);
-    println!("stdout: {}",  String::from_utf8_lossy(&resp.stdout));
-    println!("stderr: {}",  String::from_utf8_lossy(&resp.stderr));
-}
+//     println!("status: {}", &resp.status);
+//     println!("stdout: {}",  String::from_utf8_lossy(&resp.stdout));
+//     println!("stderr: {}",  String::from_utf8_lossy(&resp.stderr));
+// }
 
 fn main() {
     let mut args: Vec<String> = env::args().collect();
-    dbg!(&args);
+    // dbg!(&args);
 
     if args.len() < 2 {
         panic!("no url in arguments");
@@ -40,24 +40,26 @@ fn main() {
     }
 
     // println!("{}", &args[1]);
-    println!("using filename {} ", &filename);
 
     // wget 2 (version 1)
     // cheats and just runs the wget command from terminal
     // cheater(&args[1]);
 
+    println!("connecting to {}", &args[1]);
     let webpage = reqwest::blocking::get(&args[1])
                 .expect("is this the error message");
 
-    dbg!(&webpage);
+    // dbg!(&webpage);
     
     let body = webpage.text()
                 .expect("if this fails im fucked");
     
-    // println!("{}", body);
+    
+
+    println!("saving to '{}' ", &filename);
 
     let mut write_out = File::create(filename)
-                                                    .expect("cmon now");
+                                .expect("cmon now");
 
     write_out.write_all(&body.as_bytes())
                 .expect("sure hope that write worked");
