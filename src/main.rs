@@ -1,5 +1,6 @@
 use std::env;
 use std::process::Command;
+use reqwest;
 
 fn cheater(path: &str) {
     let resp = Command::new("wget")
@@ -23,5 +24,13 @@ fn main() {
 
     println!("{}", &args[1]);
 
-    cheater(&args[1]);
+    // wget 2 (version 1)
+    // cheats and just runs the wget command from terminal
+    // cheater(&args[1]);
+
+    let body = reqwest::blocking::get(&args[1])
+                .expect("is this the error message")
+                .text();
+    
+    println!("{}", body.expect("why am i doing this"));
 }
