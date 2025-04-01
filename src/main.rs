@@ -1,6 +1,17 @@
 use std::env;
 use std::process::Command;
 
+fn cheater(path: &str) {
+    let resp = Command::new("wget")
+                .arg(path)
+                .output()
+                .expect("wget command failed to start");
+
+    println!("status: {}", &resp.status);
+    println!("stdout: {}",  String::from_utf8_lossy(&resp.stdout));
+    println!("stderr: {}",  String::from_utf8_lossy(&resp.stderr));
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     dbg!(&args);
@@ -12,12 +23,5 @@ fn main() {
 
     println!("{}", &args[1]);
 
-    let resp = Command::new("wget")
-                .arg(args[1].clone())
-                .output()
-                .expect("wget command failed to start");
-
-    println!("status: {}", &resp.status);
-    println!("stdout: {}",  String::from_utf8_lossy(&resp.stdout));
-    println!("stderr: {}",  String::from_utf8_lossy(&resp.stderr));
+    cheater(&args[1]);
 }
