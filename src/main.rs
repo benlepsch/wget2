@@ -18,8 +18,14 @@ fn main() {
     dbg!(&args);
 
     if args.len() < 2 {
-        println!("requires url argument bozo");
-        return
+        panic!("no url in arguments");
+    }
+
+    // todo: check for 'https://' in string
+    println!("args prefix: {}", &args[1][0..7]);
+
+    if !["https:/", "http://"].contains(&&args[1][0..7]) {
+       panic!("bad url: missing prefix");
     }
 
     println!("{}", &args[1]);
