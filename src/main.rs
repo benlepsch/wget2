@@ -2,7 +2,7 @@ use std::env;
 // use std::process::Command;
 use reqwest;
 use std::fs;
-use std::io::{stdin, prelude::*};
+use std::io::{stdin, Write};
 
 // fn cheater(path: &str) {
 //     let resp = Command::new("wget")
