@@ -1,7 +1,7 @@
 use std::env;
 // use std::process::Command;
 use reqwest;
-use std::fs::File;
+use std::fs;
 use std::io::prelude::*;
 
 // fn cheater(path: &str) {
@@ -15,6 +15,10 @@ use std::io::prelude::*;
 //     println!("stderr: {}",  String::from_utf8_lossy(&resp.stderr));
 // }
 
+fn path_exists(path: &str) -> bool {
+    fs::metadata(path).is_ok()
+}
+
 fn main() {
     let mut args: Vec<String> = env::args().collect();
     // dbg!(&args);
@@ -23,7 +27,7 @@ fn main() {
         panic!("no url in arguments");
     }
 
-    let filename;
+    let mut filename;
 
     // println!("args prefix: {}", &args[1][0..7]);
     if !["https:/", "http://"].contains(&&args[1][0..7]) {
@@ -54,11 +58,22 @@ fn main() {
     let body = webpage.text()
                 .expect("if this fails im fucked");
     
-    
+    // check if filename exists
+    // i can feel the type errors already
+    let mut modded = false;
+    let mut n = 2;
+    while path_exists(&filename) {
+        if !modded {
+            filename = filename + " (1)";
+            modded = true;
+        } else {
+            filename = filename[0..(filename.len()-4)] + " ({n})";
+        } 
+    }
 
     println!("saving to '{}' ", &filename);
 
-    let mut write_out = File::create(filename)
+    let mut write_out = fs::File::create(filename)
                                 .expect("cmon now");
 
     write_out.write_all(&body.as_bytes())
