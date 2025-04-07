@@ -2,7 +2,7 @@ use std::env;
 // use std::process::Command;
 use reqwest;
 use std::fs;
-use std::io::prelude::*;
+use std::io;
 
 // fn cheater(path: &str) {
 //     let resp = Command::new("wget")
@@ -24,7 +24,13 @@ fn main() {
     // dbg!(&args);
 
     if args.len() < 2 {
-        panic!("no url in arguments");
+        println!("no url in arguments, please enter the url to fetch:");
+
+        let mut inpStr = String::new();
+        io.stdin().read_line(&mut inpStr)
+            .expect("Failed to read input");
+        
+        args.push(inpStr);
     }
 
     let mut filename;
