@@ -3,6 +3,7 @@ use std::env;
 use reqwest;
 use std::fs;
 use std::io;
+use std::io::prelude::*;
 
 // fn cheater(path: &str) {
 //     let resp = Command::new("wget")
@@ -66,6 +67,7 @@ fn main() {
     
     // check if filename exists
     // i can feel the type errors already
+    println!("using filename {}", &filename);
     let mut modded = false;
     let mut n = 2;
     while path_exists(&filename) {
@@ -76,6 +78,8 @@ fn main() {
             filename = format!("{} ({})", filename[0..(filename.len()-4)].to_string(), n);
             n += 1;
         } 
+        
+        println!("filename taken, using filename {}", &filename);
     }
 
     println!("saving to '{}' ", &filename);
