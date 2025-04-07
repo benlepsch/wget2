@@ -27,7 +27,7 @@ fn main() {
         println!("no url in arguments, please enter the url to fetch:");
 
         let mut inpStr = String::new();
-        io.stdin().read_line(&mut inpStr)
+        io::stdin().read_line(&mut inpStr)
             .expect("Failed to read input");
         
         args.push(inpStr);
