@@ -67,7 +67,7 @@ fn main() {
             filename = format!("{} ({})", filename, 1);
             modded = true;
         } else {
-            filename = format!("{} ({})", filename[0..(filename.len()-4)], n);
+            filename = format!("{} ({})", filename[0..(filename.len()-4)].to_string(), n);
             n += 1;
         } 
     }
