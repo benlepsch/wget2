@@ -64,10 +64,11 @@ fn main() {
     let mut n = 2;
     while path_exists(&filename) {
         if !modded {
-            filename = filename + " (1)";
+            filename = format!("{} ({})", filename, 1);
             modded = true;
         } else {
-            filename = filename[0..(filename.len()-4)] + " ({n})";
+            filename = format!("{} ({})", filename[0..(filename.len()-4)], n);
+            n += 1;
         } 
     }
 
