@@ -30,23 +30,39 @@ fn main() {
         stdin().read_line(&mut inp_str)
             .expect("Failed to read input");
         
-        args.push(inp_str);
+        args.push(inp_str[0..(inp_str.len()-1)].to_string());
     }
 
-    let mut filename;
+    let mut filename = String::new();
 
-    // println!("args prefix: {}", &args[1][0..7]);
-    if !["https:/", "http://"].contains(&&args[1][0..7]) {
-    //    panic!("bad url: missing prefix");
-        filename = args[1].clone();
-        args[1] = "https://".to_owned() + &args[1];
-    } else {
-        // strip http or https
+    // basically what i want to do here 
+    // filename = 'index.html' if not ('/' in list(args[1]) else args[1].split('/')[1]
+
+    // strip http/https if we have it
+    if ["https:/", "http://"].contains(&&args[1][0..7]) {
         if &args[1][4..5] == "s" {
             filename = args[1][8..].to_string();
         } else {
             filename = args[1][7..].to_string();
         }
+    } else {
+        // if we don't have the header, add it to the url
+        filename = args[1].clone();
+        args[1] = "https://".to_owned() + &args[1];
+    }
+
+    // check for '/'
+    println!("Filename: {}", &filename);
+    if filename.contains("/") {
+        // set filename to string contents after the last '/'
+        for (i, c) in filename.chars().rev().enumerate() {
+            if c == '/' {
+                filename = filename[i..filename.len()].to_string();
+                break;
+            }
+        }
+    } else {
+        filename = "index.html".to_string();
     }
 
     // println!("{}", &args[1]);
