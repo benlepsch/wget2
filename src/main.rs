@@ -130,16 +130,16 @@ fn main() {
     }
 
     // separate url from path
-    let mut url: String;
-    let mut path: String;
+    let mut url = String::new();
+    let mut path = "".to_string();
     let mut done_url = false;
 
     for part in args[1].split("/") {
         if !done_url {
-            url = part;
+            url = part.to_string();
             done_url = true;
         } else {
-            path.push(format!("/{}", part));
+            path = format!("{}/{}", path, part);
         }
     }
 
