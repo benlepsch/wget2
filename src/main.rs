@@ -15,6 +15,7 @@ fn path_exists(path: &str) -> bool {
 
 fn fetch_data(url: String) -> Result<String> {
     let ip_addr = format!("{}{}", url, ":80");
+    println!("using addr {}", ip_addr);
     let mut stream = TcpStream::connect(&ip_addr)?;   
     println!("connected to {ip_addr}");
 
@@ -105,7 +106,7 @@ fn main() {
         // set filename to string contents after the last '/'
         for (i, c) in filename.chars().rev().enumerate() {
             if c == '/' {
-                filename = filename[i..filename.len()].to_string();
+                filename = filename[(i+1)..filename.len()].to_string();
                 break;
             }
         }
@@ -128,6 +129,7 @@ fn main() {
         println!("filename taken, using filename {}", &filename);
     }
 
+    println!("fetching from URL {}", &args[1]);
     let html = fetch_data(args[1].clone()).unwrap();
 
     println!("saving to '{}' ", &filename);
