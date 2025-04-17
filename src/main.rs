@@ -6,6 +6,7 @@ use std::io::{Result, stdin, Write};
 use std::fs;
 use std::env;
 
+#[allow(non_snake_case)]
 mod HttpRequest;
 
 fn path_exists(path: &str) -> bool {
