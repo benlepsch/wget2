@@ -13,7 +13,7 @@ fn path_exists(path: &str) -> bool {
     fs::metadata(path).is_ok()
 }
 
-fn fetch_data(url: String) -> Result<String> {
+fn fetch_data(url: String, path: String) -> Result<String> {
     let ip_addr = format!("{}{}", url, ":80");
     println!("using addr {}", ip_addr);
     let mut stream = TcpStream::connect(&ip_addr)?;   
@@ -21,7 +21,7 @@ fn fetch_data(url: String) -> Result<String> {
 
     println!("Building GET request");
     let req = HttpRequest::HttpRequest::new(
-        HttpRequest::MethodKind::GET, url, None);
+        HttpRequest::MethodKind::GET, path, None);
 
     println!("Sending request to server");
     let _ = stream.write(&req.serialize());
@@ -129,8 +129,21 @@ fn main() {
         println!("filename taken, using filename {}", &filename);
     }
 
-    println!("fetching from URL {}", &args[1]);
-    let html = fetch_data(args[1].clone()).unwrap();
+    // separate url from path
+    let mut url: String;
+    let mut path: String;
+    let mut done_url = false;
+
+    for part in args[1].split("/") {
+        if !done_url {
+            url = part;
+            done_url = true;
+        } else {
+            path.push(format!("/{}", part));
+        }
+    }
+
+    let html = fetch_data(url, path).unwrap();
 
     println!("saving to '{}' ", &filename);
 
