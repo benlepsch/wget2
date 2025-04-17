@@ -107,6 +107,7 @@ fn main() {
         for (i, c) in filename.chars().rev().enumerate() {
             if c == '/' {
                 filename = filename[(i+1)..filename.len()].to_string();
+                filename = format!("{}.html", filename);
                 break;
             }
         }
