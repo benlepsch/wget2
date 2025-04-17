@@ -1,9 +1,88 @@
-use std::env;
+use std::net::TcpStream;
+
+use std::io::prelude::*;
+use std::io::{Result, stdin, Write};
+
 use std::fs;
-use std::io::{stdin, Write};
+use std::env;
+
+mod HttpRequest;
 
 fn path_exists(path: &str) -> bool {
     fs::metadata(path).is_ok()
+}
+
+fn fetch_data(url: String) -> Result<String> {
+    let ip_addr = format!("{}{}", url, ":80");
+    let mut stream = TcpStream::connect(&ip_addr)?;   
+    println!("connected to {ip_addr}");
+
+    println!("Building GET request");
+    let req = HttpRequest::HttpRequest::new(
+        HttpRequest::MethodKind::GET, url, None);
+
+    println!("Sending request to server");
+    let _ = stream.write(&req.serialize());
+
+    println!("Reading reply");
+    /*
+        headers = []
+        while last two bytes are not "\r\n" {
+            current = ''
+            while last two bytes are not "\r\n" {
+                push onto current
+            }
+            push to headers
+            read out the next two bytes
+        }
+    */
+    let mut headers = Vec::new();
+    let mut tmp = [0; 1];
+    let mut last: u8;
+    
+    stream.read(&mut tmp).expect("someting wrong");
+    last = tmp[0];
+    stream.read(&mut tmp).expect("somethign wrong");
+
+    // "\r\n" = 0x0d 0x0a
+    while last != 13 && tmp[0] != 10 {
+        let mut current = String::new();
+
+        while last != 13 && tmp[0] != 10 {
+            current.push(last as char);
+            last = tmp[0];
+            stream.read(&mut tmp).expect("something wrong");
+        }
+
+        headers.push(current);
+
+        // 0x0d 0x0a 0x.. 0x.. 0x.. 
+        // last tmp 
+        stream.read(&mut tmp).expect("something wrong");
+        last = tmp[0];
+        stream.read(&mut tmp).expect("somethg wrong");
+    }
+    
+    // println!("done");
+    // dbg!(&headers);
+
+    let _http_resp = headers[0].clone();
+    headers.remove(0);
+
+    let header_map: std::collections::HashMap<&str, &str> = headers.iter()
+        .map(|header| {
+            let mut split = header.split(": ");
+            (split.next().unwrap(), split.next().unwrap())
+        })
+        .collect();
+
+    // dbg!(&header_map);
+    let msg_length = header_map["Content-Length"].parse::<usize>().unwrap();
+    let mut buf = vec![0; msg_length];
+    stream.read(&mut buf).expect("somethign wrong (last)");
+
+    let to_str = std::str::from_utf8(&buf).unwrap().to_string();
+    Ok(to_str)
 }
 
 fn main() {
@@ -19,26 +98,8 @@ fn main() {
         args.push(inp_str[0..(inp_str.len()-1)].to_string());
     }
 
-    let mut filename = String::new();
+    let mut filename = args[1].clone();
 
-    // basically what i want to do here 
-    // filename = 'index.html' if not ('/' in list(args[1]) else args[1].split('/')[1]
-
-    // strip http/https if we have it
-    if ["https:/", "http://"].contains(&&args[1][0..7]) {
-        if &args[1][4..5] == "s" {
-            filename = args[1][8..].to_string();
-        } else {
-            filename = args[1][7..].to_string();
-        }
-    } else {
-        // if we don't have the header, add it to the url
-        filename = args[1].clone();
-        args[1] = "https://".to_owned() + &args[1];
-    }
-
-    // check for '/'
-    println!("Filename: {}", &filename);
     if filename.contains("/") {
         // set filename to string contents after the last '/'
         for (i, c) in filename.chars().rev().enumerate() {
@@ -51,9 +112,6 @@ fn main() {
         filename = "index.html".to_string();
     }
 
-   
-    // check if filename exists
-    // i can feel the type errors already
     println!("using filename {}", &filename);
     let mut modded = false;
     let mut n = 2;
@@ -69,11 +127,13 @@ fn main() {
         println!("filename taken, using filename {}", &filename);
     }
 
+    let html = fetch_data(args[1].clone()).unwrap();
+
     println!("saving to '{}' ", &filename);
 
     let mut write_out = fs::File::create(filename)
                                 .expect("cmon now");
 
-    // write_out.write_all(&body.as_bytes())
-    //            .expect("sure hope that write worked");
+    write_out.write_all(&html.as_bytes())
+                .expect("sure hope that write worked");
 }
