@@ -103,7 +103,7 @@ fn main() {
 
     if filename.contains("/") {
         // set filename to string contents after the last '/'
-        filename = filename.split("/").last().unwrap();
+        filename = filename.split("/").last().unwrap().to_string();
     } else {
         filename = "index.html".to_string();
     }
@@ -119,7 +119,7 @@ fn main() {
     let nohtml = filename.replace(".html", "");
     let mut n = 1;
     while path_exists(&tmp) {
-        tmp = format("{nohtml}_{n}".html);
+        tmp = format!("{nohtml}_{n}.html");
         n += 1;    
         println!("filename taken, using filename {}", &tmp);
     }
