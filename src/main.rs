@@ -14,8 +14,8 @@ fn path_exists(path: &str) -> bool {
 }
 
 fn fetch_data(url: String, path: String) -> Result<String> {
-    let ip_addr = format!("{}{}", url, ":80");
-    println!("using addr {}", ip_addr);
+    let ip_addr = format!("{url}:80");
+    println!("using addr {ip_addr}");
     let mut stream = TcpStream::connect(&ip_addr)?;   
     println!("connected to {ip_addr}");
 
@@ -46,11 +46,10 @@ fn fetch_data(url: String, path: String) -> Result<String> {
     last = tmp[0];
     stream.read(&mut tmp).expect("somethign wrong");
 
-    // "\r\n" = 0x0d 0x0a
-    while last != 13 && tmp[0] != 10 {
+    while last != b'\r' && tmp[0] != b'\n' {
         let mut current = String::new();
 
-        while last != 13 && tmp[0] != 10 {
+        while last != b'\r' && tmp[0] != b'\n' {
             current.push(last as char);
             last = tmp[0];
             stream.read(&mut tmp).expect("something wrong");
@@ -97,38 +96,35 @@ fn main() {
         stdin().read_line(&mut inp_str)
             .expect("Failed to read input");
         
-        args.push(inp_str[0..(inp_str.len()-1)].to_string());
+        args.push(inp_str.trim().to_string());
     }
 
     let mut filename = args[1].clone();
 
     if filename.contains("/") {
         // set filename to string contents after the last '/'
-        for (i, c) in filename.chars().rev().enumerate() {
-            if c == '/' {
-                filename = filename[(i+1)..filename.len()].to_string();
-                filename = format!("{}.html", filename);
-                break;
-            }
-        }
+        filename = filename.split("/").last().unwrap();
     } else {
         filename = "index.html".to_string();
     }
 
-    println!("using filename {}", &filename);
-    let mut modded = false;
-    let mut n = 2;
-    while path_exists(&filename) {
-        if !modded {
-            filename = format!("{} ({})", filename, 1);
-            modded = true;
-        } else {
-            filename = format!("{} ({})", filename[0..(filename.len()-4)].to_string(), n);
-            n += 1;
-        } 
-        
-        println!("filename taken, using filename {}", &filename);
+    // make sure filename has html extension
+    if !filename.contains(".html") {
+        filename = format!("{filename}.html");
     }
+
+    println!("using filename {}", &filename);
+
+    let mut tmp = filename.clone();
+    let nohtml = filename.replace(".html", "");
+    let mut n = 1;
+    while path_exists(&tmp) {
+        tmp = format("{nohtml}_{n}".html);
+        n += 1;    
+        println!("filename taken, using filename {}", &tmp);
+    }
+
+    filename = tmp;
 
     // separate url from path
     let mut url = String::new();
